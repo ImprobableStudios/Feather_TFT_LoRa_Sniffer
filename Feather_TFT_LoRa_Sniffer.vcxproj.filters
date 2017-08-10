@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Feather_TFT_LoRa_Sniffer.ino" />
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.Feather_TFT_LoRa_Sniffer.vsarduino.h">

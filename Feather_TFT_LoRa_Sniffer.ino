@@ -1,10 +1,11 @@
 /*
- Name:		Feather_TFT_LoRa_Sniffer.ino
- Created:	7/31/2017 6:04:42 PM
- Author:	joe
+ Name:      Feather_TFT_LoRa_Sniffer.ino
+ Created:   7/31/2017 6:04:42 PM
+ Author:    joe
 */
 
 #include <SPI.h>
+#include <SD.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
 #include <RH_RF95.h>
@@ -12,10 +13,10 @@
 #include <stdarg.h>
 
 #ifdef ESP8266
-#define STMPE_CS 16
-#define TFT_CS   0
-#define TFT_DC   15
-#define SD_CS    2
+#define STMPE_CS  16
+#define TFT_CS    0
+#define TFT_DC    15
+#define SD_CS     2
 
 #define LED       x
 
@@ -85,17 +86,19 @@
 #endif
 
 #define TEXT_HEIGHT_UNSCALED    8
-#define PRINTFLN_MAXLEN         128
+#define PRINTFLN_MAXLEN         256
 
-#define RH_FLAGS_ACK 0x80
+#define RH_FLAGS_ACK            0x80
+
+#define LOG_HEADER              "MS,Freq,FreqPacketCount,RSSI,From,To,MsgId,Flags,Ack,DataLen,DataBytes,Data"
 
 // Define the frequencies to scan
 #define FREQ_COUNT 19
 float _frequencies[] =
 {
     868.0, 915.0,                                                   // From Adafruit Learn
-    903.9, 904.1, 904.3, 904.5, 904.7, 904.9, 905.1, 905.3, 904.6,  // TNN - US Uplink
-    923.3, 923.9, 924.5, 925.1, 925.7, 926.3, 926.9, 927.5          // TNN - US Downlink
+    903.9, 904.1, 904.3, 904.5, 904.7, 904.9, 905.1, 905.3, 904.6,  // TTN - US Uplink
+    923.3, 923.9, 924.5, 925.1, 925.7, 926.3, 926.9, 927.5          // TTN - US Downlink
 };
 
 // How long should a frequency be monitored
@@ -114,7 +117,8 @@ uint8_t  _rxRecvLen;                                        // number of bytes a
 char     _printBuffer[512]  = "\0";                         // to send output to the PC
 uint32_t _freqExpire        = 0;                            // Millisecond at which frequency should change
 uint32_t _freqIndex         = 0;                            // Which frequency is currently monitored
-
+bool     _sdReady           = false;                        // Is a file open and ready for writing?
+File     _logfile;                                          // Log file on SD card
 
 void tft_printfln(uint8_t size, uint16_t fg_color, uint16_t bg_color, char *fmt, ...)
 {
@@ -163,17 +167,74 @@ void rf95_setFrequency(uint32_t index)
     Serial.println(_printBuffer);
 }
 
+void sd_inititalize(void)
+{
+    if (SD.begin(SD_CS))
+    {
+        char filename[15];
+
+        strcpy(filename, "LORA__00.TXT");
+
+        for (uint8_t i = 0; i < 100; i++)
+        {
+            filename[6] = '0' + i / 10;
+            filename[7] = '0' + i % 10;
+
+            // create if does not exist, do not open existing, write, sync after write
+            if (!SD.exists(filename))
+            {
+                break;
+            }
+        }
+
+        _logfile = SD.open(filename, FILE_WRITE);
+
+        if (!_logfile)
+        {
+            Serial.print("Couldnt create ");
+            Serial.println(filename);
+            tft_printfln(2, ILI9341_BLACK, ILI9341_RED, "File create failed  ");
+        }
+        else
+        {
+            Serial.print("Writing to ");
+            Serial.println(filename);
+            tft_printfln(2, ILI9341_BLACK, ILI9341_GREEN, "File: %12s  ", filename);
+
+            // Set flag to indicate we can write to SD
+            _sdReady = true;
+        }
+    }
+    else
+    {
+        tft_printfln(2, ILI9341_BLACK, ILI9341_RED, "SD Init failed      ");
+        Serial.println("SD.begin() failed!");
+    }
+}
+
 void setup()
 {
+    // Configure pins
     pinMode(LED, OUTPUT);
     pinMode(RFM95_RST, OUTPUT);
     digitalWrite(RFM95_RST, HIGH);
 
-    while (!Serial);
+    // The RFM95 has a pulldown on this pin, so the radio
+    // is technically always selected unless you set the pin low
+    // this will cause other SPI devices to fail to function as 
+    // expected because CS (active-low) will be selected for 
+    // the RFM95 at the same time.
+    digitalWrite(RFM95_CS, HIGH);
 
+    // Wait for serial to initialize before proceeding, so all output can be seen
+    // This will block stand-alone operations
+//    while (!Serial);
+
+    // Initialize Serial
     Serial.begin(115200);
     delay(100);
 
+    // Initialize TFT
     _tft.begin();
     _tft.fillScreen(ILI9341_BLACK);
     _tft.setRotation(0);
@@ -181,7 +242,10 @@ void setup()
 
     tft_printfln(2, ILI9341_BLACK, ILI9341_GREEN, "LoRa Network Probe  ");
 
-    // manual reset
+    // Initialize SD
+    sd_inititalize();
+
+    // Initialize Radio
     digitalWrite(RFM95_RST, LOW);
     delay(10);
     digitalWrite(RFM95_RST, HIGH);
@@ -195,28 +259,33 @@ void setup()
 
     tft_printfln(2, ILI9341_BLACK, ILI9341_GREEN, "LoRa init OK        ");
 
-    // Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
-    // Defaults after init are 434.0MHz, modulation GFSK_Rb250Fd250, +13dbM
     rf95_setFrequency(_freqIndex);
-
-    // need to setPromiscuous(true) to receive all frames
     rf95.setPromiscuous(true);
 
+    // Update time for changing frequency
     _freqExpire = millis() + FREQ_TIME_MS;
+
+    // Log the header for CSV output
+    Serial.println(LOG_HEADER);
+    if (_sdReady)
+    {
+        _logfile.println(LOG_HEADER);
+        _logfile.flush();
+    }
 }
 
 void loop()
 {
-    // wait for a lora packet
-    _rxRecvLen = sizeof(_rxBuffer);               // RadioHead expects max buffer, will update to received bytes
+    _rxRecvLen = sizeof(_rxBuffer);
 
     digitalWrite(LED, LOW);
 
     rf95.setModeRx();
 
+    // Handle incoming packet if available
     if (rf95.recv(_rxBuffer, &_rxRecvLen))
     {
-        char isAck[4] = { "" };
+        char isAck[4] = { "   " };
 
         digitalWrite(LED, HIGH);
 
@@ -229,17 +298,50 @@ void loop()
 
         _rxBuffer[_rxRecvLen] = '\0';
 
-        snprintf(_printBuffer, sizeof(_printBuffer), "Signal(RSSI)= %d (Freq: %d)", rf95.lastRssi(), (uint32_t)(_frequencies[_freqIndex] * 10));
-        tft_printfln(1, ILI9341_GREEN, ILI9341_BLACK, _printBuffer);
+        // Output to TFT
+        tft_printfln(1, ILI9341_GREEN, ILI9341_BLACK, "Signal(RSSI)= %d (Freq: %d)", rf95.lastRssi(), (uint32_t)(_frequencies[_freqIndex] * 10));
+        tft_printfln(1, ILI9341_GREEN, ILI9341_BLACK, " %d >> %d MsgId:%d Flags:%2x %s", rf95.headerFrom(), rf95.headerTo(), rf95.headerId(), rf95.headerFlags(), isAck);
+        tft_printfln(1, ILI9341_GREEN, ILI9341_BLACK, " %d => %s", _rxRecvLen, _rxBuffer);
+
+        // Prepare delimited output for log
+        snprintf(_printBuffer, sizeof(_printBuffer), "%u,%u.%u,%04d,%d,%d,%d,%d,%02X,%s,%d,",
+            millis(),
+            (uint32_t)(_frequencies[_freqIndex] * 10) / 10,
+            (uint32_t)(_frequencies[_freqIndex] * 10) % 10,
+            _packetCounts[_freqIndex],
+            rf95.lastRssi(),
+            rf95.headerFrom(),
+            rf95.headerTo(),
+            rf95.headerId(),
+            rf95.headerFlags(),
+            isAck,
+            _rxRecvLen
+        );
+
+        // Add bytes received as hex values
+        for (int i = 0; i < _rxRecvLen; i++)
+        {
+            snprintf(_printBuffer, sizeof(_printBuffer), "%s %02X", _printBuffer, _rxBuffer[i]);
+        }
+
+        // Add bytes received as string - this is usually ugly and useless, but
+        // it is here just in case. Maybe someone will send something in plaintext
+        snprintf(_printBuffer, sizeof(_printBuffer), "%s,%s", _printBuffer, _rxBuffer);
+
         Serial.println(_printBuffer);
-        snprintf(_printBuffer, sizeof(_printBuffer), " %d >> %d MsgId:%d Flags:%2x %s", rf95.headerFrom(), rf95.headerTo(), rf95.headerId(), rf95.headerFlags(), isAck);
-        tft_printfln(1, ILI9341_GREEN, ILI9341_BLACK, _printBuffer);
-        Serial.println(_printBuffer);
-        snprintf(_printBuffer, sizeof(_printBuffer), " %d => %s", _rxRecvLen, _rxBuffer);
-        tft_printfln(1, ILI9341_GREEN, ILI9341_BLACK, _printBuffer);
-        Serial.println(_printBuffer);
+
+        if (_sdReady)
+        {
+            _logfile.println(_printBuffer);
+
+            // Flushing adds overhead to the write time, but do it. FAT is VERY sensitive
+            // to corruption.  If you don't flush regularly you WILL corrupt the File Allocation Table -
+            // it is very difficult to avoid
+            _logfile.flush();
+        }
     }
 
+    // Change frequency if it is time
     if (millis() > _freqExpire)
     {
         rf95.setModeIdle();
