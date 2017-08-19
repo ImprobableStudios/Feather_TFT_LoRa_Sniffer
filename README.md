@@ -1,7 +1,7 @@
 # Feather TFT LoRa Sniffer
 Easy to build device that can scan LoRa channels, displaying any monitored packets on the TFT display while logging data to an SD card.
 
-![alt text](https://github.com/ImprobableStudios/Feather_TFT_LoRa_Sniffer/blob/master/img/Overview.JPG "Device view")
+![Device view](https://github.com/ImprobableStudios/Feather_TFT_LoRa_Sniffer/blob/master/img/Overview.JPG "Device view")
 
 ## Parts
 - [Adafruit Feather M0 with RFM95 LoRa Radio - 900MHz](https://www.adafruit.com/product/3178)
@@ -41,15 +41,15 @@ When I saw Adafruit's [3D printable case](https://learn.adafruit.com/3d-printed-
 
 I am going to recycle some bits and suggest you take a look at [Adafruit's how-to for the TFT FeatherWing enclosure](https://learn.adafruit.com/3d-printed-case-for-adafruit-feather/tft-feather-wing). They do a great job of showing how to put it together.
 
-![alt text](https://github.com/ImprobableStudios/Feather_TFT_LoRa_Sniffer/blob/master/img/CaseOpen.JPG "Parts view")
+![Parts view](https://github.com/ImprobableStudios/Feather_TFT_LoRa_Sniffer/blob/master/img/CaseOpen.JPG "Parts view")
 
-The only challenge I ran into in assembly was soldering the uFL connector for the antenna.  This was challenging without my microscope (even a USB camera microscope would have helped), but I managed to do it, only damaging on connector in the process. The trick is to prime one ground pad with solder, then work the connector into place while heating the pad.  Once that is done, the other two pads can be soldered as well.  Take care when soldering the center tab, as it is easy to short this to ground (I did this my first attempt). Check for continuity after you finished to be sure the antenna is not shorted.
+The only challenge I ran into in assembly was soldering the uFL connector for the antenna.  This was challenging without my microscope (even a USB camera microscope would have helped), but I managed to do it, only damaging one connector in the process. The trick is to prime one ground pad with solder, then work the connector into place while heating the pad.  Once that is done, the other two pads can be soldered as well.  Take care when soldering the center tab, as it is easy to short this to ground (I did this my first attempt). Check for continuity after you finished to be sure the antenna is not shorted.
 
-![alt text](https://github.com/ImprobableStudios/Feather_TFT_LoRa_Sniffer/blob/master/img/uFL.JPG "uFL view")
+![uFL view](https://github.com/ImprobableStudios/Feather_TFT_LoRa_Sniffer/blob/master/img/uFL.JPG "uFL view")
 
-I also needed to find a place for the external antenna connector in the case.  I found that the lower left corner was the best spot, just to the left of the SD-card slot. Even with the provided lockwasher, it was necessary to secure the connector to prevent it from rotating.  I used a basic hot-glue gun to do this, but superglue, or acetone-welding would have worked just as well.
+I also needed to find a place for the external antenna connector in the case.  I found that the lower left corner was the best spot, just to the left of the SD-card slot. Even with the provided lock-washer, it was necessary to secure the connector to prevent it from rotating.  I used a basic hot-glue gun to do this, but superglue, or acetone-welding would have worked just as well.
 
-![alt text](https://github.com/ImprobableStudios/Feather_TFT_LoRa_Sniffer/blob/master/img/Antenna.JPG "Antenna view")
+![Antenna view](https://github.com/ImprobableStudios/Feather_TFT_LoRa_Sniffer/blob/master/img/Antenna.JPG "Antenna view")
 
 To secure the battery, I used a small piece of PSA (double stick tape). This fits nicely under the SD card slot, but may need to be angled in order to fit well between the antenna connector and switch. **I strongly suggest doing this last and with care as you do not want to bend or puncture the battery**.
 
@@ -102,7 +102,7 @@ void tft_printfln(uint8_t size, uint16_t fg_color, uint16_t bg_color, char *fmt,
 }
 ```
 
-There is a bug in the function that causes it to occassionally cut off a line when scrolling, but I haven't had a chance to track this down yet. But, it's pretty cool to be able to write scrolling text to this little screen with ease.
+There is a bug in the function that causes it to occasionally cut off a line when scrolling, but I haven't had a chance to track this down yet. Regardless, it's pretty cool to be able to write scrolling text to this little screen with ease.
 
 ![Scrolling view](https://github.com/ImprobableStudios/Feather_TFT_LoRa_Sniffer/blob/master/img/Scrolling.JPG "Scrolling view")
 
@@ -130,9 +130,9 @@ There is likely some optimization that can be done around this. The radio can on
 ### Logging to SD
 If you have an SD card installed when you power on the device, it will log the data received in CSV format for you. The last column of data is a raw print of the bytes received.  In general, this isn't useful, but in the case of someone sending plain-text, you might just find something!
 
-Here is a view of some data received just by leaving the device running for a day. DataBytes is cut off in the picture, but contains all the bytes received. The ASCII display of the data wasn't useful in this case.
+Here is a view of some data received just by leaving the device running for a day. `DataBytes` is cut off in the picture, but contains all the bytes received. The ASCII display of the data wasn't useful in this case.
 
-![Excel view](https://github.com/ImprobableStudios/Feather_TFT_LoRa_Sniffer/blob/master/img/Excel.JPG "Excel view")
+![Excel view](https://github.com/ImprobableStudios/Feather_TFT_LoRa_Sniffer/blob/master/img/Excel.jpg "Excel view")
 
 ## Conclusion
 Hopefully you find this project useful. Let me know what you do with it and how you have modified it. I'm always open to suggestions and ideas.
