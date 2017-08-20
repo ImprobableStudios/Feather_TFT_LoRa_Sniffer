@@ -131,7 +131,7 @@ When changing frequencies, the display will show what frequency it is monitoring
 ### Logging to SD
 If you have an SD card installed when you power on the device, it will log the data received in CSV format for you. The last column of data is a raw print of the bytes received.  In general, this isn't useful, but in the case of someone sending plain-text, you might just find something!
 
-> Note: The FAT filesystem... sucks. I have worked with it for years, even writing my own embedded implementation for commercial projects. Yes, it is compatible with everything, but it is incredibly easy to corrupt the File Allocation Table and render the filesystem unreadable. Just keep this in mind. You may lose data if you pull the card out while a write is happening, or if you fail to flush at the right interval. Consider yourself warned.
+> Note: The FAT filesystem is not resilient. Yes, it is compatible with everything, but it is incredibly easy to corrupt the File Allocation Table and render the filesystem unreadable. Just keep this in mind. You may lose data if you pull the card out while a write is happening, or if you fail to flush at the right interval. Consider yourself warned.
 
 Here is a view of some data received just by leaving the device running for a day. `DataBytes` is cut off in the picture, but the column contains all the bytes received. The ASCII display of the data wasn't useful in this case, so I clipped it from the image.
 
