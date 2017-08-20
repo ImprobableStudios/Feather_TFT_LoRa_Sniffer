@@ -35,19 +35,18 @@ My interests are a bit different; the [RadioHead library](http://www.airspayce.c
 
 Before building a mesh with a bunch of nodes, I decided it would be interesting to see how much LoRa is being used in my area. How is this best achieved? By building a portable sniffer/scanner of course! This device should be in a form factor that I can set on a windowsill, put in my pocket when I walk around, or on my dash while I drive.  
 
-When I saw Adafruit's [3D printable case](https://learn.adafruit.com/3d-printed-case-for-adafruit-feather/tft-feather-wing) for their [TFT FeatherWing](https://www.adafruit.com/product/3315), I was inspired.  This looked like the perfect enclosure for my project. This, along with a [Feather M0 with RFM95 LoRa Radio](https://www.adafruit.com/product/3178), and an antenna, battery, and switch makes a complete solution.
+When I saw Adafruit's [3D printable case](https://learn.adafruit.com/3d-printed-case-for-adafruit-feather/tft-feather-wing) for their [TFT FeatherWing](https://www.adafruit.com/product/3315), I was inspired.  This looked like the perfect enclosure for my project. This, along with a [Feather M0 with RFM95 LoRa Radio](https://www.adafruit.com/product/3178), an antenna, battery, and switch makes a complete solution.
 
 ## Assembly
-
 I am going to recycle some bits and suggest you take a look at [Adafruit's how-to for the TFT FeatherWing enclosure](https://learn.adafruit.com/3d-printed-case-for-adafruit-feather/tft-feather-wing). They do a great job of showing how to put it together.
 
 ![Parts view](https://github.com/ImprobableStudios/Feather_TFT_LoRa_Sniffer/blob/master/img/CaseOpen.JPG "Parts view")
 
-The only challenge I ran into in assembly was soldering the uFL connector for the antenna.  This was challenging without my microscope (even a USB camera microscope would have helped), but I managed to do it, only damaging one connector in the process. The trick is to prime one ground pad with solder, then work the connector into place while heating the pad.  Once that is done, the other two pads can be soldered as well.  Take care when soldering the center tab, as it is easy to short this to ground (I did this my first attempt). Check for continuity after you finished to be sure the antenna is not shorted.
+The only challenge I ran into in assembly was soldering the uFL connector for the antenna.  This was difficult without my microscope (even a USB camera microscope would have helped), but I managed to do it, only damaging one connector in the process. The trick is to prime one ground pad with solder, then work the connector into place while heating the pad.  Once that is done, the other two pads can be soldered as well.  Take care when soldering the center tab, as it is easy to short this to ground (I did this my first attempt). **Check for (lack of) continuity between the center and ground after you finished to be sure the antenna is not shorted**.
 
 ![uFL view](https://github.com/ImprobableStudios/Feather_TFT_LoRa_Sniffer/blob/master/img/uFL.JPG "uFL view")
 
-I also needed to find a place for the external antenna connector in the case.  I found that the lower left corner was the best spot, just to the left of the SD-card slot. Even with the provided lock-washer, it was necessary to secure the connector to prevent it from rotating.  I used a basic hot-glue gun to do this, but superglue, or acetone-welding would have worked just as well.
+I also needed to find a place for the external antenna connector in the case.  I found that the lower left corner was the best spot, just to the left of the SD-card slot. Even with the provided lock-washer, it was necessary to secure the connector to prevent it from rotating.  I used hot-glue to do this, but superglue, or acetone-welding would have likely worked just as well.
 
 ![Antenna view](https://github.com/ImprobableStudios/Feather_TFT_LoRa_Sniffer/blob/master/img/Antenna.JPG "Antenna view")
 
