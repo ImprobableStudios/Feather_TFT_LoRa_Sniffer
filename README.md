@@ -35,7 +35,7 @@ My interests are a bit different; the [RadioHead library](http://www.airspayce.c
 
 Before building a mesh with a bunch of nodes, I decided it would be interesting to see how much LoRa is being used in my area. How is this best achieved? By building a portable sniffer/scanner of course! This device should be in a form factor that I can set on a windowsill, put in my pocket when I walk around, or on my dash while I drive.  
 
-When I saw Adafruit's [3D printable case](https://learn.adafruit.com/3d-printed-case-for-adafruit-feather/tft-feather-wing) for their [TFT FeatherWing](https://www.adafruit.com/product/3315), I was intriqued.  This looked like the perfect enclosure for my project. This, along with a [Feather M0 with RFM95 LoRa Radio](https://www.adafruit.com/product/3178), an antenna, battery, and switch makes a complete solution.
+When I saw Adafruit's [3D printable case](https://learn.adafruit.com/3d-printed-case-for-adafruit-feather/tft-feather-wing) for their [TFT FeatherWing](https://www.adafruit.com/product/3315), I was intrigued.  This looked like the perfect enclosure for my project. This, along with a [Feather M0 with RFM95 LoRa Radio](https://www.adafruit.com/product/3178), an antenna, battery, and switch makes a complete solution.
 
 ## Assembly
 I am going to recycle some bits and suggest you take a look at [Adafruit's how-to for the TFT FeatherWing enclosure](https://learn.adafruit.com/3d-printed-case-for-adafruit-feather/tft-feather-wing). They do a great job of showing how to put it together.
@@ -55,7 +55,7 @@ To secure the battery, I used a small piece of PSA (double stick tape). This fit
 Now that we have a device, let's take a look at making it do something useful.
 
 ## Firmware
-When Adafruit introduced the Cortex-M0 based Feathers, I was pretty excited.  I have a lot of experience working "on-the-metal" with the Cortex-M series in commercial products including helping architect the initial OS/scheduler used in the Xbox One Controller (Cortex-M0) and in the now "disbanded" Microsoft Band (Cortex-M4).  Currently I am at a dark-startup where we are using an nRF51 and Kinetis K24 with FreeRTOS, both also from the Cortex-M family. 
+When Adafruit introduced the Cortex-M0 based Feathers, I was pretty excited.  I have a lot of experience working "on-the-metal" with the Cortex-M series in commercial products including helping architect the initial OS/scheduler used in the Xbox One Controller (Cortex-M0) and in the now "disbanded" Microsoft Band (Cortex-M4).  Currently, I am at a dark-startup where we are using an nRF51 and Kinetis K24 with FreeRTOS, both also from the Cortex-M family. 
 
 Working directly on-the-metal with nothing in your way except the header files and compiler can be fun and educational, but sometimes you just want to sit down and make something cool. Using an Arduino compatible IDE with the Feather M0 is a great way to do this.
 
@@ -122,7 +122,7 @@ float _frequencies[] =
 #define FREQ_TIME_MS            5000
 ```
 
-There is likely some optimization that can be done around this. The radio can only monitor one frequency at a time, and you must receive an entire LoRa packet while listening in order to parse it - but, the more time you spend on one channel, the more you might be missing on others! Currently I have this set at 5 seconds going across 19 different channels. This seems to work ok, I am seeing traffic for sure.
+There is likely some optimization that can be done around this. The radio can only monitor one frequency at a time, and you must receive an entire LoRa packet while listening in order to parse it - but, the more time you spend on one channel, the more you might be missing on others! Currently, I have this set at 5 seconds going across 19 different channels. This seems to work ok, I am seeing traffic for sure.
 
 When changing frequencies, the display will show what frequency it is monitoring and the number of valid packets that have been previously seen on that frequency.  Here you can see that I picked up quite a bit of data just by leaving the device running while sitting next to a window for a few days.
 
@@ -138,7 +138,7 @@ Here is a view of some data received just by leaving the device running for a da
 ![Excel view](https://github.com/ImprobableStudios/Feather_TFT_LoRa_Sniffer/blob/master/img/Excel.jpg "Excel view")
 
 ## Conclusion
-Hopefully you find this project useful. Let me know what you do with it and how you have modified it. I'm always open to suggestions and ideas!
+Hopefully, you find this project useful. Let me know what you do with it and how you have modified it. I'm always open to suggestions and ideas!
 
 My next project will likely be a standalone, solar charged mesh node that sends its' battery level back to another node.  This will allow me to see how well a true wireless node can perform in "sunny" Seattle.
 
