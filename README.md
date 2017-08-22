@@ -142,7 +142,7 @@ Hopefully, you find this project useful. Let me know what you do with it and how
 
 My next project will likely be a standalone, solar charged mesh node that sends its' battery level back to another node.  This will allow me to see how well a true wireless node can perform in "sunny" Seattle.
 
-Thanks for reading!
+Thanks for reading! Check my blog for comments and more projects as they come available: http://zeroth.improbablestudios.com/
 
 -Joe
 (joe at improbablestudios.com)
